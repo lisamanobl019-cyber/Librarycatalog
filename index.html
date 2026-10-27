@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookSpace — Библиотека</title>
+    
+    <style>
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #F5F0E6; color: #243B35; }
+        header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; padding: 18px 6%; background: white; box-shadow: 0 3px 12px #243b3510; }
+        .logo { color: #243B35; font-size: 24px; font-weight: bold; text-decoration: none; }
+        nav { display: flex; flex-wrap: wrap; gap: 20px; }
+        nav a { color: #243B35; text-decoration: none; }
+        nav a:hover { color: #C58B55; }
+        button, .main-button { border: none; border-radius: 8px; padding: 12px 16px; background: #243B35; color: white; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        button:hover, .main-button:hover { background: #C58B55; transform: translateY(-2px); }
+        .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 35px; padding: 50px 7%; background: #243B35; color: white; }
+        .hero h1 { font-size: clamp(35px, 5vw, 55px); line-height: 1.15; }
+        .hero h1 span { color: #E2B987; }
+        .hero img { width: 100%; height: 320px; object-fit: cover; border-radius: 15px; }
+        .hero p { line-height: 1.7; }
+        .eyebrow { color: #E2B987; letter-spacing: 2px; }
+        .main-button { display: inline-block; background: #C58B55; color: white; text-decoration: none; margin-top: 10px; }
+        .container { max-width: 1200px; margin: auto; padding: 35px 20px; }
+        h2 { text-align: center; font-size: 29px; }
+        .subtitle { text-align: center; color: #7b8178; margin-bottom: 25px; }
+        .filters { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        input, select { width: 100%; min-width: 0; padding: 13px; border: 1px solid #ddd7ca; border-radius: 8px; background: white; font-size: 15px; }
+        .book-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+        .book-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px #243b3510; transition: 0.25s; display: flex; flex-direction: column; }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 9px 20px #243b3520; }
+        .book-card img { width: 100%; height: 350px; object-fit: cover; display: block; background: #e5ded0; }
+        .book-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .genre-tag { color: #79552e; background: #f4e5d1; padding: 5px 9px; border-radius: 20px; font-size: 12px; display: inline-block; }
+        .book-info h3 { margin: 12px 0 8px; }
+        .author { color: #7b8178; font-size: 14px; margin-bottom: 15px; }
+        .book-buttons { display: grid; gap: 8px; }
+        .details-button { background: #f0e7d8; color: #243B35; }
+        .details-button:hover { color: white; }
+        .secondary-button { background: #C58B55; margin-top: 15px; }
+        .my-books { background: #eae3d5; }
+        .saved-book { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 15px 0; border-bottom: 1px solid #d2c7b5; }
+        .saved-book p { margin: 5px 0; }
+        #emptyMessage { text-align: center; }
+        .about { text-align: center; line-height: 1.8; }
+        footer { background: #243B35; color: white; text-align: center; padding: 25px; }
+        dialog { width: min(550px, 92%); max-height: 90vh; overflow-y: auto; border: none; border-radius: 14px; padding: 20px; box-shadow: 0 10px 50px #0004; }
+        dialog::backdrop { background: #10251fcc; }
+        .close-button { display: block; margin-left: auto; margin-bottom: 15px; background: #6b746c; }
+        .detail-image { display: block; width: 100%; height: 400px; object-fit: contain; border-radius: 10px; background: #f4f4f4; }
+        .detail-description { color: #68746b; line-height: 1.7; }
+        @media (max-width: 900px) { .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hero { grid-template-columns: 1fr; } }
+        @media (max-width: 550px) { header { justify-content: center; } nav { justify-content: center; } .filters, .book-grid { grid-template-columns: 1fr; } .hero img { height: 230px; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="#home" class="logo">📚 BookSpace</a>
+    <nav>
+        <a href="#home">Главная</a>
+        <a href="#catalog">Каталог</a>
+        <a href="#about">О библиотеке</a>
+    </nav>
+    <button id="myBooksButton">Мои книги (<span id="bookCount">0</span>)</button>
+</header>
+
+<section class="hero" id="home">
+    <div>
+        <p class="eyebrow">ТВОЙ МИР ЗНАНИЙ</p>
+        <h1>Открой книгу.<br><span>Открой мир.</span></h1>
+        <p>Находи интересные книги, изучай новое и вдохновляйся историями.</p>
+        <a href="#catalog" class="main-button">Перейти в каталог ↓</a>
+    </div>
+    <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=900&auto=format&fit=crop&q=80" alt="Уютная библиотека">
+</section>
+
+<main class="container" id="catalog">
+    <h2>Каталог книг</h2>
+    <p class="subtitle">Найди свою следующую любимую книгу</p>
+
+    <div class="filters">
+        <input id="search" type="search" placeholder="🔍 Название или автор...">
+        
+        <select id="genre">
+            <option value="Все">Все жанры</option>
+            <option value="Фэнтези">Фэнтези</option>
+            <option value="Детектив">Детектив</option>
+            <option value="Современный роман">Современный роман</option>
+        </select>
+        
+        <select id="sort">
+            <option value="default">По умолчанию</option>
+            <option value="asc">По названию А–Я</option>
+            <option value="desc">По названию Я–А</option>
+        </select>
+    </div>
+
+    <div id="bookGrid" class="book-grid"></div>
+    <p id="emptyMessage"></p>
+</main>
+
+<section id="myBooks" class="my-books">
+    <div class="container">
+        <h2>📖 Мои книги</h2>
+        <p class="subtitle">Книги, которые ты выбрала</p>
+        <div id="myBooksList"></div>
+        <button id="clearBooks" class="secondary-button">Очистить список</button>
+    </div>
+</section>
+
+<section class="about container" id="about">
+    <h2>О нашей библиотеке</h2>
+    <p>BookSpace — удобный каталог для поиска интересных книг.<br>Выбирай жанры, читай описание и сохраняй книги в свой список.</p>
+</section>
+
+<footer>
+    <h2>📚 BookSpace</h2>
+    <p>Читайте больше — открывайте новое!</p>
+    <p>© 2026 BookSpace</p>
+</footer>
+
+<dialog id="bookDialog">
+    <button id="closeDialog" class="close-button">✕ Закрыть</button>
+    <div id="bookDetails"></div>
+</dialog>
+
+<script>
+    // Полный список книг
+    const books = [
+        // --- Старые книги ---
+        {
+            id: 1,
+            title: "Шестёрка Воронов",
+            author: "Ли Бардуго",
+            genre: "Фэнтези",
+            year: 2015,
+            image: "vorony.jpg",
+            description: "История о шести опасных изгоях, которым предстоит совершить невозможное ограбление."
+        },
+        {
+            id: 2,
+            title: "Терра и турнир Тринадцати",
+            author: "Мая Сара",
+            genre: "Фэнтези",
+            year: 2023,
+            image: "terra.jpg",
+            description: "Захватывающая история о магии, турнирах и тайнах, скрытых под звездным небом."
+        },
+        {
+            id: 3,
+            title: "Четвёртое крыло",
+            author: "Ребекка Яррос",
+            genre: "Фэнтези",
+            year: 2023,
+            image: "krylo.jpg",
+            description: "Смертельно опасная академия, где драконы выбирают своих всадников."
+        },
+        {
+            id: 4,
+            title: "Канашибари",
+            author: "Ангелина и Вероника Шен",
+            genre: "Фэнтези",
+            year: 2023,
+            image: "kanashibari.jpg",
+            description: "Мрачная и завораживающая история, полная масок, бабочек и древних тайн."
+        },
+        {
+            id: 5,
+            title: "Убийство в «Восточном экспрессе»",
+            author: "Агата Кристи",
+            genre: "Детектив",
+            year: 1934,
+            image: "kristi.jpg",
+            description: "Классический детектив Эркюля Пуаро о загадочном убийстве в застрявшем поезде."
+        },
+
+        // --- Новые книги ---
+        {
+            id: 6,
+            title: "Мара и Морок",
+            author: "Лия Арден",
+            genre: "Фэнтези",
+            year: 2020,
+            image: "mara.jpg",
+            description: "История о девушке, поднятой из могилы, и её связи с загадочным Мороком. Славянское фэнтези."
+        },
+        {
+            id: 7,
+            title: "Ресторан 06:06:06",
+            author: "Пом Ю Джин",
+            genre: "Фэнтези",
+            year: 2023,
+            image: "restoran.jpg",
+            description: "В Сеуле появляется загадочный ресторан, где демон предлагает исполнить желания в обмен на «рецепт души»."
+        },
+        {
+            id: 8,
+            title: "Эллиот",
+            author: "Мая Сара",
+            genre: "Фэнтези",
+            year: 2024,
+            image: "elliot.jpg",
+            description: "Мистическая история о семье Уолтеров, страннике и пророчестве, которое изменило будущее."
+        },
+        {
+            id: 9,
+            title: "Наследница чёрного дракона",
+            author: "Анна Джейн",
+            genre: "Фэнтези",
+            year: 2024,
+            image: "drakon.jpg",
+            description: "Романтическое фэнтези об академии магии, брачной клятве с принцем и ненависти, переходящей в любовь."
+        },
+        {
+            id: 10,
+            title: "Бернаут",
+            author: "Виктория Побединская",
+            genre: "Современный роман",
+            year: 2025,
+            image: "bernaut.jpg",
+            description: "История о мотоспорте, соперничестве, фиктивном браке и сложных чувствах."
+        },
+        {
+            id: 11,
+            title: "Зацепить 13-го",
+            author: "Хлоя Уолш",
+            genre: "Современный роман",
+            year: 2024,
+            image: "zacepit.jpg",
+            description: "История о Шаннон и Джонни: борьба с буллингом, домашним насилием и поиск себя."
+        },
+        {
+            id: 12,
+            title: "Академия Весны",
+            author: "Ксюша Левина",
+            genre: "Фэнтези",
+            year: 2023,
+            image: "vesna.jpg",
+            description: "История о сирене Брайт и маге земли Рейве, связанных проклятием и вынужденных чувствовать друг друга."
+        },
+        {
+            id: 13,
+            title: "Разломы",
+            author: "Мэтти Мансон",
+            genre: "Фэнтези",
+            year: 2024,
+            image: "razlomy.jpg",
+            description: "Захватывающая история о разломах в реальности и тайнах, которые они скрывают."
+        }
+    ];
+
+    let myBooks = [];
+    try {
+        myBooks = JSON.parse(localStorage.getItem("bookSpaceBooks")) || [];
+        if (!Array.isArray(myBooks)) myBooks = [];
+    } catch { myBooks = []; }
+
+    function saveBooks() { localStorage.setItem("bookSpaceBooks", JSON.stringify(myBooks)); }
+
+    function renderBooks() {
+        const search = document.getElementById("search").value.trim().toLowerCase();
+        const genre = document.getElementById("genre").value;
+        const sort = document.getElementById("sort").value;
+
+        let result = books.filter(book => {
+            const matchesSearch = book.title.toLowerCase().includes(search) || book.author.toLowerCase().includes(search);
+            const matchesGenre = genre === "Все" || book.genre === genre;
+            return matchesSearch && matchesGenre;
+        });
+
+        if (sort === "asc") result.sort((a, b) => a.title.localeCompare(b.title, "ru"));
+        if (sort === "desc") result.sort((a, b) => b.title.localeCompare(a.title, "ru"));
+
+        document.getElementById("bookGrid").innerHTML = result.map(book => `
+            <article class="book-card">
+                <img src="${book.image}" alt="${book.title}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/500x700/F5F0E6/243B35?text=Ошибка+загрузки'">
+                <div class="book-info">
+                    <div>
+                        <span class="genre-tag">${book.genre}</span>
+                        <h3>${book.title}</h3>
+                        <p class="author">${book.author}</p>
+                    </div>
+                    <div class="book-buttons">
+                        <button class="details-button" onclick="showDetails(${book.id})">Подробнее</button>
+                        <button onclick="toggleBook(${book.id})">${myBooks.includes(book.id) ? "✓ В моих книгах" : "+ Добавить"}</button>
+                    </div>
+                </div>
+            </article>
+        `).join("");
+
+        document.getElementById("emptyMessage").textContent = result.length ? "" : "Книги не найдены.";
+        renderMyBooks();
+    }
+
+    document.getElementById("search").addEventListener("input", renderBooks);
+    document.getElementById("genre").addEventListener("change", renderBooks);
+    document.getElementById("sort").addEventListener("change", renderBooks);
+
+    function showDetails(id) {
+        const book = books.find(item => item.id === id);
+        if (!book) return;
+
+        document.getElementById("bookDetails").innerHTML = `
+            <img class="detail-image" src="${book.image}" alt="${book.title}" onerror="this.onerror=null;this.src='https://placehold.co/500x700/F5F0E6/243B35?text=Ошибка+загрузки'">
+            <span class="genre-tag" style="margin-top: 15px;">${book.genre}</span>
+            <h2>${book.title}</h2>
+            <p><strong>Автор:</strong> ${book.author}</p>
+            <p><strong>Год публикации:</strong> ${book.year}</p>
+            <p class="detail-description">${book.description}</p>
+            <button onclick="toggleBook(${book.id})" style="width: 100%;">${myBooks.includes(book.id) ? "Удалить из моих книг" : "Добавить в мои книги"}</button>
+        `;
+        document.getElementById("bookDialog").showModal();
+    }
+
+    document.getElementById("closeDialog").addEventListener("click", () => {
+        document.getElementById("bookDialog").close();
+    });
+
+    function toggleBook(id) {
+        if (myBooks.includes(id)) { myBooks = myBooks.filter(bookId => bookId !== id); } 
+        else { myBooks.push(id); }
+        saveBooks();
+        renderBooks();
+        if (document.getElementById("bookDialog").open) { showDetails(id); }
+    }
+
+    function renderMyBooks() {
+        const selectedBooks = books.filter(book => myBooks.includes(book.id));
+        document.getElementById("bookCount").textContent = selectedBooks.length;
+        document.getElementById("myBooksList").innerHTML = selectedBooks.length
+            ? selectedBooks.map(book => `
+                <div class="saved-book">
+                    <div><strong>${book.title}</strong><p>${book.author}</p></div>
+                    <button onclick="toggleBook(${book.id})" style="background: #b04a4a;">Удалить</button>
+                </div>
+            `).join("")
+            : "<p>Ты пока не добавила книги.</p>";
+    }
+
+    document.getElementById("myBooksButton").addEventListener("click", () => {
+        document.getElementById("myBooks").scrollIntoView({ behavior: "smooth" });
+    });
+
+    document.getElementById("clearBooks").addEventListener("click", () => {
+        myBooks = [];
+        saveBooks();
+        renderBooks();
+    });
+
+    renderBooks();
+</script>
+</body>
+</html>
